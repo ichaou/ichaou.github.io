@@ -1,0 +1,175 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+   <!--  <script src="https://unpkg.com/vue@next"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <script src="https://unpkg.com/element-plus"></script> -->
+    <script charset="utf-8" src="js/vue.global.js"></script>
+    <link rel="stylesheet" href="js/index.css">
+    <script charset="utf-8" src="js/index.full.js"></script>
+    <title>自定义导航</title>
+    <base target="_blank">
+    <style>
+      .el-card__body{
+        width: 100%;
+      }
+      .el-col {
+        border-radius: 4px;
+      }
+      [v-cloak] {
+        display:none !important;;
+      }
+      .link-t{
+        padding-left: 10px;text-overflow: -o-ellipsis-lastline;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+      .tag-t{
+        margin: 2px;
+      }
+    </style>
+  </head>
+  <body>
+<div id="app">
+<el-row justify="center">
+  <el-col :span="12" style="display:flex;justify-content: center;">
+    <div >
+    <img id="s_lg_img" src="img/baidu.png" width="270" height="129" v-if="select=='百度'"  v-cloak>
+    <img id="s_lg_img" src="img/toutiao.png" width="270" height="129" v-else  v-cloak>
+    </div>
+  </el-col>
+</el-row>
+<el-row justify="center">
+  <el-col :span="12" >
+  <div style="margin-top: 15px">
+  <el-input autofocus=true placeholder="请输入内容" v-model="searchInfo" class="input-with-select" v-on:keyup.enter.native="search">
+    <template #prepend>
+     <el-select v-model="select" placeholder="请选择" style="width: 80px;">
+        <el-option label="百度" value="百度"></el-option>
+        <el-option label="头条" value="头条"></el-option>
+      </el-select>
+    </template>
+    <template #append>
+      <el-button icon="el-icon-search"  @click="search"></el-button>
+    </template>
+  </el-input>
+  </div>
+  </el-col>
+</el-row>
+<el-row justify="center" style="margin-top: 30px">
+  <el-col :span="18">
+    <el-skeleton style="width: 100%" :loading="loading"  :count="2">
+      <template #template>
+      </template>
+      <template #default>
+  <el-tabs type="border-card" style="min-height: 300px;">
+  <template v-for="(s,index) in sitesInfo">
+    <el-tab-pane   >
+      <template #label>
+        <span><i :class="'el-icon-' +s.icon"></i> {{s.sitesName}}</span>
+      </template>
+      <div style="display: flex;justify-content: left;flex-flow: row wrap; align-items: center;"> 
+      <template v-for="(site,index) in s.sites">
+      <el-card shadow="hover" style="display: flex;justify-content: center;width: 23%; margin-top: 10px;margin-bottom: 10px; margin-right: 10px; position: relative;" >
+        <div style="position: absolute;top: -2px;left: 0px;"> <el-rate  v-model="site.sLevel"  v-if="site.sLevel!=''"  disabled   text-color="#ff9900" ></el-rate></div>
+        <el-row type="flex" justify="space-around" align="middle">
+          <el-col :span="4" style="display: flex;justify-content: flex-end;">
+            <el-avatar :size="30"  :src="site.sImg" v-if="site.sImg!=''" ></el-avatar>
+            <el-avatar :size="30" v-if="site.sImg==''"  v-bind:style="{ background: colorlists[Math.floor(Math.random()*10)]}">{{site.sName.substr(0,1)}}</el-avatar>
+          </el-col>
+          <el-col :span="16"  style="display: flex;justify-content: flex-start;" >
+            <el-link class="link-t" :href="site.sUrl">{{site.sName}}</el-link>
+          </el-col>
+          <!-- 说明浮动 -->
+          <el-col :span="4"  style="display: flex;justify-content: flex-start;" >
+            <el-tooltip placement="right"   effect="light" style="margin-left: 5px;vertical-align: top;">
+              <template #content>
+                <el-tag size="small" class="tag-t">{{site.sName}}</el-tag><br>
+                <el-tag size="small"  class="tag-t">{{site.sUrl}}</el-tag><br>
+                <el-tag size="small" v-if="site.sInfo!=''"   class="tag-t">{{site.sInfo}}</el-tag><br>
+              </template>
+              <i class="el-icon-document-copy"></i>  
+            </el-tooltip>
+         </el-col>
+      </el-row>
+      </el-card>
+    </template>
+     </div>
+    </el-tab-pane>
+  </template>
+</el-tabs>
+</template>
+</el-skeleton>
+</el-col>
+</el-row>
+<el-row justify="center">
+  <el-col :span="12" style="display:flex;justify-content: center;">
+    <el-skeleton style="width: 100%" :loading="loading"  :count="0">
+      <template #template>
+      </template>
+      <template #default>
+    <div style="padding: 10px;">
+    </div>
+  </el-col>
+</template>
+</el-skeleton>
+</el-row>
+</div>
+<script charset="utf-8" src="json.js"></script>
+<script>
+  const App = {
+    data() {
+      return {
+        loading: false,
+        select: '',
+        searchInfo:'',
+        sitesInfo: json,   
+        colorlists: [
+        'hsl(42, 48%, 54%)',
+        'hsl(138, 24%, 48%)',
+        'rgb(200, 138, 131)',
+        'rgb(84, 221, 226)',
+        'rgb(178, 199, 168)',
+        'rgb(16, 195, 195)',
+        'hsl(0, 21%, 68%)',
+        'rgb(226, 166, 198)',
+        'hsl(278, 17%, 66%)',
+        'rgb(153, 199, 235)',
+        'blueviolet'
+      ]
+      };
+    },
+  mounted() {
+      this.loading = true
+      this.select='百度'
+      setTimeout(() => (this.loading = false), 500)
+   },
+  methods: {
+      search: function () {
+        if(this.select=='百度')
+        {
+          window.open('https://www.baidu.com/s?wd='+this.searchInfo, '_blank');
+        }
+        if(this.select=='头条'&&this.searchInfo!='')
+        {
+          window.open('https://so.toutiao.com/search?dvpf=pc&source=input&keyword='+this.searchInfo, '_blank');
+        }
+        if(this.select=='头条'&&this.searchInfo=='')
+        {
+          window.open('https://www.toutiao.com/', '_blank');
+        }
+    },
+  },
+ 
+  };
+      const app = Vue.createApp(App);
+      app.use(ElementPlus);
+      app.mount("#app");
+    </script>
+  </body>
+</html>
